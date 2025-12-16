@@ -19,6 +19,12 @@ To run:
 bun run dev
 ```
 
+rename .env.example to .env
+
+```sh
+cp .env.example .env
+```
+
 run with docker
 
 ```sh
