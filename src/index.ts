@@ -20,7 +20,7 @@ app.post('/auth', async (c) => {
 
 app.get('/verify', async (c) => {
   const authorization = c.req.header('Authorization')
-  const token = authorization?.replace('Bearer', '')
+  const token = authorization?.replace('Bearer ', '')
 
   if (!token) {
     return c.json({ message: "Unauthorized" }, 401)
