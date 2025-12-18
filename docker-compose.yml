@@ -6,6 +6,7 @@ services:
       - "3000:3000"
     volumes:
       - ./:/app
+      - /app/node_modules # ← this *masks* the host node_modules in container
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - NODE_ENV=development
