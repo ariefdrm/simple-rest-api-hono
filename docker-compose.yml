@@ -5,17 +5,19 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./:/app
-      - /app/node_modules # ← this *masks* the host node_modules in container
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
     environment:
       - DATABASE_URL=${DATABASE_URL}
-      - NODE_ENV=development
-    restart: unless-stopped
+      - NODE_ENV=${NODE_ENV}
+    command: >
+      sh -c "bunx prisma migrate deploy && bun run --hot src/index.ts"
+    restart: always
     depends_on:
       db:
         condition: service_healthy
   db:
-    image: postgres:17
+    image: postgres:17-alpine
     container_name: postgres_db
     restart: unless-stopped
     environment:
@@ -30,6 +32,6 @@ services:
       test: ["CMD-SHELL", "pg_isready -U ${PGUSER} -d ${PGDATABASE}"]
       interval: 2s
       timeout: 2s
-      retries: 10
+      retries: 5
 volumes:
   postgres_data:

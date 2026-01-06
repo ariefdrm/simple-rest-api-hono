@@ -1,23 +1,16 @@
-FROM oven/bun:alpine
+FROM oven/bun:alpine as base
+WORKDIR /usr/src/app
 
-WORKDIR /app
+# Gunakan wildcard agar fleksibel dengan bun.lock atau bun.lock
+COPY package.json bun.lock* ./
+RUN bun install --frozen-lockfile
 
-COPY package.json bun.lock ./
-
-RUN bun install --frozen-lockfile  # Still good for image consistency
-
-# Generate Prisma Client saat build
-COPY prisma ./prisma
-RUN bunx prisma generate
+# Copy konfigurasi TS agar alias terbaca saat build/generate
+COPY tsconfig.json ./
+COPY ./prisma ./prisma
+RUN bunx prisma generate 
 
 COPY . .
 
-COPY docker-entrypoint.sh ./
-
-RUN chmod +x ./docker-entrypoint.sh
-
 EXPOSE 3000
-
-ENTRYPOINT ["./docker-entrypoint.sh"]
-
-CMD ["bun", "start"]
+ENTRYPOINT [ "bun", "start" ]

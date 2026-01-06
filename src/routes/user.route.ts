@@ -1,7 +1,7 @@
-import { Hono } from "hono";
-import { prisma } from "../configs/db.config";
-import { User } from "../utils/UserScheme";
-import { jwt } from "hono/jwt";
+import { prisma } from "@/configs/db.config"
+import { User } from "@/utils/UserScheme"
+import { Hono } from "hono"
+import { jwt } from "hono/jwt"
 
 const user = new Hono()
 
@@ -11,9 +11,14 @@ user.use('/*', jwt({
 
 // get all data
 user.get('/', async (c) => {
-  const data = await prisma.users.findMany({ orderBy: { id: 'asc' } })
+  try {
+    const data = await prisma.users.findMany({ orderBy: { id: 'asc' } })
 
-  return c.json({ data: data })
+    return c.json({ data: data })
+  } catch (error) {
+
+    return c.json({ message: "Unauthorized" }, 401)
+  }
 })
 
 // get specific data from user "id"
@@ -49,6 +54,7 @@ user.post('/', async (c) => {
   return c.json({ message: "failed to create a new user", name }, 422)
 })
 
+// edit data by id 
 user.patch('/:id', async (c) => {
   const id = c.req.param('id')
   const data: User = await c.req.json()
@@ -65,6 +71,7 @@ user.patch('/:id', async (c) => {
   return c.json({ message: 'update data successfully', data })
 })
 
+// delete data by id
 user.delete('/:id', async (c) => {
   const id = Number(c.req.param('id'))
 
